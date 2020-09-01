@@ -172,6 +172,7 @@ module RubyDanfe
 
       especie = nil
       marca = nil
+      numeracao = nil
 
       @xml.collect('xmlns', 'vol') do |det|
         @vol += 1
@@ -181,6 +182,7 @@ module RubyDanfe
 
         especie ||= det.css('esp').text
         marca ||= det.css('marca').text
+        numeracao ||= det.css('nVol').text
       end
 
       if @vol == 0
@@ -194,7 +196,7 @@ module RubyDanfe
         @pdf.ibox 0.85, 2.80, 0.25, 16.60, "QUANTIDADE", (quantidade.round == quantidade ? quantidade.to_i : quantidade).to_s
         @pdf.ibox 0.85, 5.00, 3.05, 16.60, "ESPÉCIE", especie
         @pdf.ibox 0.85, 3.05, 8.05, 16.60, "MARCA", marca
-        @pdf.ibox 0.85, 3.00, 11.10, 16.60, "NUMERAÇÃO"
+        @pdf.ibox 0.85, 3.00, 11.10, 16.60, "NUMERAÇÃO", numeracao
         @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", peso_bruto.to_s, {:decimals => 3}
         @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", peso_liquido.to_s, {:decimals => 3}
       end
@@ -261,7 +263,7 @@ module RubyDanfe
 
       info_adicional += @xml['infAdic/infCpl']
 
-      if @xml.css('entrega')
+      if @xml.css('entrega').any?
         info_adicional += " LOCAL DA ENTREGA: " +
           @xml['entrega/xLgr'] + " " +
           @xml['entrega/nro'] + " " +
