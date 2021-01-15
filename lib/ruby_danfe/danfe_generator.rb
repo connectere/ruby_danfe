@@ -76,7 +76,7 @@ module RubyDanfe
       @pdf.ibox 0.85, 10.02, 10.79, 6.46, "PROTOCOLO DE AUTORIZAÇÃO DE USO", @xml['infProt/nProt'] + ' ' + Helper.format_datetime(@xml['infProt/dhRecbto']) , {:align => :center}
       @pdf.ibox 0.85, 6.86, 0.25, 7.31, "INSCRIÇÃO ESTADUAL", @xml['emit/IE']
       @pdf.ibox 0.85, 6.86, 7.11, 7.31, "INSC.ESTADUAL DO SUBST. TRIBUTÁRIO", @xml['emit/IEST']
-      @pdf.ibox 0.85, 6.84, 13.97, 7.31, "CNPJ", @xml['emit/CNPJ']
+      @pdf.ibox 0.85, 6.84, 13.97, 7.31, "CNPJ/CPF", @xml['emit/CNPJ'].present? ? @xml['emit/CNPJ'] : @xml['emit/CPF']
     end
 
     def render_titulo
