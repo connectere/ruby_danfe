@@ -34,6 +34,7 @@ module RubyDanfe
       self.options = new_options if !new_options.empty?
 
       xml = XML.new(xml_string)
+      xml_cce = XML.new(new_options[:xml_cce]) if type == :cce
 
       generator =
         case type
@@ -42,6 +43,7 @@ module RubyDanfe
           when :dacte then DacteGenerator.new(xml)
           when :danfse then DanfseGenerator.new(xml)
           when :dacteos then DacteosGenerator.new(xml)
+          when :cce then CceGenerator.new(xml, xml_cce)
           else raise "unknown type #{type}"
         end
       generator.generatePDF
