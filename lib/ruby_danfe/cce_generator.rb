@@ -1,9 +1,10 @@
 # coding: utf-8
 module RubyDanfe
   class CceGenerator
-    def initialize(xml_nfe, xml_cce)
+    def initialize(xml_nfe, xml_cce, logo = nil)
       @xml = xml_nfe
       @xml_cce = xml_cce
+      @logo = logo
       @pdf = Document.new
       @vol = 0
     end
@@ -22,6 +23,7 @@ module RubyDanfe
     private
 
     def render_titulo
+      @pdf.image @logo, { at: [37, 776], fit: [ 50, 50 ] } if @logo.present?
       @pdf.ibox 2.4, 20, 0.5, 1
       @pdf.ibox 1, 20, 0.5, 1.2, '', "CARTA DE CORREÇÃO ELETRÔNICA", {:size => 13, :align => :center, :border => 0, :style => :bold}
       @pdf.ibox 1, 20, 0.5, 1.9, '', "Não possui valor fiscal. Simples representação do evento indicado abaixo.", {:size => 10, :align => :center, :border => 0}

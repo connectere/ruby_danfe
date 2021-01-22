@@ -38,12 +38,12 @@ module RubyDanfe
 
       generator =
         case type
-          when :danfe then DanfeGenerator.new(xml)
+          when :danfe then DanfeGenerator.new(xml, new_options[:logo])
           when :danfe_nfce then DanfeNfceGenerator.new(xml)
           when :dacte then DacteGenerator.new(xml)
           when :danfse then DanfseGenerator.new(xml)
           when :dacteos then DacteosGenerator.new(xml)
-          when :cce then CceGenerator.new(xml, xml_cce)
+          when :cce then CceGenerator.new(xml, xml_cce, new_options[:logo])
           else raise "unknown type #{type}"
         end
       generator.generatePDF

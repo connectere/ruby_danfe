@@ -1,10 +1,11 @@
 # coding: utf-8
 module RubyDanfe
   class DanfeGenerator
-    def initialize(xml)
+    def initialize(xml, logo = nil)
       @xml = xml
       @pdf = Document.new
       @vol = 0
+      @logo = logo
     end
 
     def generatePDF
@@ -51,6 +52,7 @@ module RubyDanfe
     end
 
     def render_emitente
+      @pdf.image @logo, { at: [152, 667], fit: [ 35, 35 ] } if @logo.present?
       @pdf.ibox 3.92, 6.46, 0.25, 2.54, '',
         @xml['emit/xNome'] + "\n" +
         @xml['enderEmit/xLgr'] + ", " + @xml['enderEmit/nro'] + "\n" +
