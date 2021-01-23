@@ -29,7 +29,7 @@ module RubyDanfe
 
     def ibarcode(h, w, x, y, info)
       info = info.gsub(/\D/, '')
-      Barby::Code128C.new(info).annotate_pdf(self, :x => x.cm, :y => Helper.invert(y.cm), :width => w.cm, :height => h.cm) if info != ''
+      Barby::Code128C.new(info).annotate_pdf(self, :xdim => 0.7,:x => x.cm, :y => Helper.invert(y.cm), :width => w.cm, :height => h.cm) if info != ''
     end
 
     def iqrcode(x, y, info, size = nil)

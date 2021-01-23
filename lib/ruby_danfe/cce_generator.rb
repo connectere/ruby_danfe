@@ -37,7 +37,7 @@ module RubyDanfe
       @pdf.ibox 0.85, 2, 4.5, 4.5, "NÚMERO", @xml['ide/nNF']
       @pdf.ibox 0.85, 3, 6.5, 4.5, "MÊS / ANO DA EMISSÃO", Helper.format_date(@xml['ide/dhEmi']).last(7)
       @pdf.ibox 1.7, 11, 9.5, 4.5
-      @pdf.ibarcode 1, 8, 10.1, 5.8, @xml['chNFe']
+      @pdf.ibarcode 1, 8, 11.5, 5.85, @xml['chNFe']
       @pdf.ibox 0.85, 9, 0.5, 5.35, "CHAVE DE ACESSO", @xml['chNFe'].gsub(/\D/, '').gsub(/(\d)(?=(\d\d\d\d)+(?!\d))/, "\\1 ")
     end
 
