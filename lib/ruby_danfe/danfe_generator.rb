@@ -52,9 +52,16 @@ module RubyDanfe
     end
 
     def render_emitente
-      @pdf.image @logo, { at: [15, 715], fit: [ 50, 50 ] } if @logo.present?
+      if @logo.present?
+        @pdf.image @logo, { at: [15, 715], fit: [ 50, 50 ] }
+        emitente_width = 7.46
+        emitente_left = 2.25
+      else
+        emitente_width = 7.46
+        emitente_left = 1.25
+      end
       @pdf.ibox 3.92, 9.46, 0.25, 2.54
-      @pdf.ibox 3.92, 7.46, 2.25, 2.54, '',
+      @pdf.ibox 3.92, emitente_width, emitente_left, 2.54, '',
         @xml['emit/xNome'] + "\n" +
         @xml['enderEmit/xLgr'] + ", " + @xml['enderEmit/nro'] + "\n" +
         @xml['enderEmit/xBairro'] + " - " + @xml['enderEmit/CEP'] + "\n" +
