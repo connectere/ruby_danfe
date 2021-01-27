@@ -162,7 +162,7 @@ module RubyDanfe
       @pdf.ibox 0.85, 1.78, 12.06, 14.90, "CODIGO ANTT", @xml['veicTransp/RNTC']
       @pdf.ibox 0.85, 2.29, 13.84, 14.90, "PLACA DO VEÍCULO", @xml['veicTransp/placa']
       @pdf.ibox 0.85, 0.76, 16.13, 14.90, "UF", @xml['veicTransp/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 14.90, "CNPJ/CPF", @xml['transporta/CNPJ']
+      @pdf.ibox 0.85, 3.94, 16.89, 14.90, "CNPJ/CPF", (@xml['transporta/CNPJ'].present? ? @xml['transporta/CNPJ'] : @xml['transporta/CPF'])
       @pdf.ibox 0.85, 9.02, 0.25, 15.75, "ENDEREÇO", @xml['transporta/xEnder']
       @pdf.ibox 0.85, 6.86, 9.27, 15.75, "MUNICÍPIO", @xml['transporta/xMun']
       @pdf.ibox 0.85, 0.76, 16.13, 15.75, "UF", @xml['transporta/UF']
