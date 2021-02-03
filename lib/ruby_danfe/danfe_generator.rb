@@ -52,9 +52,16 @@ module RubyDanfe
     end
 
     def render_emitente
-      @pdf.image @logo, { at: [15, 715], fit: [ 50, 50 ] } if @logo.present?
+      if @logo.present?
+        @pdf.image @logo, { at: [15, 715], fit: [ 50, 50 ] }
+        emitente_width = 7.46
+        emitente_left = 2.25
+      else
+        emitente_width = 7.46
+        emitente_left = 1.25
+      end
       @pdf.ibox 3.92, 9.46, 0.25, 2.54
-      @pdf.ibox 3.92, 7.46, 2.25, 2.54, '',
+      @pdf.ibox 3.92, emitente_width, emitente_left, 2.54, '',
         @xml['emit/xNome'] + "\n" +
         @xml['enderEmit/xLgr'] + ", " + @xml['enderEmit/nro'] + "\n" +
         @xml['enderEmit/xBairro'] + " - " + @xml['enderEmit/CEP'] + "\n" +
@@ -74,10 +81,10 @@ module RubyDanfe
       @pdf.ibox 2.20, 8.02, 12.79, 2.54
       if @xml['chNFe'].present?
         @pdf.ibarcode 1.50, 8.00, 13.4010, 4.44, @xml['chNFe']
-        @pdf.ibox 0.85, 8.02, 12.79, 4.74, "CHAVE DE ACESSO", @xml['chNFe'].gsub(/\D/, '').gsub(/(\d)(?=(\d\d\d\d)+(?!\d))/, "\\1 "), {:style => :bold, :align => :center}
+        @pdf.ibox 0.85, 8.02, 12.79, 4.74, "CHAVE DE ACESSO", @xml['chNFe'].gsub(/\D/, '').gsub(/(\d)(?=(\d\d\d\d)+(?!\d))/, "\\1 "), {:style => :bold, :align => :center, size: 9}
       else
         @pdf.ibox 1.50, 8.00, 13.4010, 4.44, 'MODELO'
-        @pdf.ibox 0.85, 8.02, 12.79, 4.74, "CHAVE DE ACESSO", "DANFE MODELO - SEM VALOR FISCAL", {:style => :bold, :align => :center}
+        @pdf.ibox 0.85, 8.02, 12.79, 4.74, "CHAVE DE ACESSO", "DANFE MODELO - SEM VALOR FISCAL", {:style => :bold, :align => :center, size: 9}
       end
       @pdf.ibox 0.85, 8.02, 12.79, 5.60 , '', "Consulta de autenticidade no portal nacional da NF-e www.nfe.fazenda.gov.br/portal ou no site da Sefaz Autorizadora", {:align => :center, :size => 8}
 
