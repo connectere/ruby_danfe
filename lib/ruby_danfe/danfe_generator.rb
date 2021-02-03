@@ -78,12 +78,13 @@ module RubyDanfe
         "N°. " + @xml['ide/nNF'] + "\n" +
         "SÉRIE " + @xml['ide/serie'], {:size => 8, :align => :center, :valign => :center, :border => 0, :style => :bold}
 
-      @pdf.ibox 2.20, 8.02, 12.79, 2.54
       if @xml['chNFe'].present?
+        @pdf.ibox 2.20, 8.02, 12.79, 2.54
         @pdf.ibarcode 1.50, 8.00, 13.4010, 4.44, @xml['chNFe']
         @pdf.ibox 0.85, 8.02, 12.79, 4.74, "CHAVE DE ACESSO", @xml['chNFe'].gsub(/\D/, '').gsub(/(\d)(?=(\d\d\d\d)+(?!\d))/, "\\1 "), {:style => :bold, :align => :center, size: 9}
       else
-        @pdf.ibox 1.50, 8.00, 13.4010, 4.44, 'MODELO'
+        @pdf.ibox 2.20, 8.02, 12.79, 2.54
+        @pdf.ibox 1.50, 8.00, 13.4010, 4.44, '', "MODELO", {:size => 14, :align => :center, :border => 0, :style => :bold}
         @pdf.ibox 0.85, 8.02, 12.79, 4.74, "CHAVE DE ACESSO", "DANFE MODELO - SEM VALOR FISCAL", {:style => :bold, :align => :center, size: 9}
       end
       @pdf.ibox 0.85, 8.02, 12.79, 5.60 , '', "Consulta de autenticidade no portal nacional da NF-e www.nfe.fazenda.gov.br/portal ou no site da Sefaz Autorizadora", {:align => :center, :size => 8}
