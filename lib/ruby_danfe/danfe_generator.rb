@@ -367,7 +367,7 @@ module RubyDanfe
       when '3'
         "3- Remetente (Transp. Próprio)"
       when '4'
-        "4- Remetente (Transp.Dest)"
+        "4- Destinatário (Transp.Próprio)"
       when '9'
         "9 - Sem frete"
       else
