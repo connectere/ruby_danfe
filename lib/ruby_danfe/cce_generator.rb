@@ -98,8 +98,8 @@ module RubyDanfe
 
     def render_correcao
       @pdf.ititle 1, 10, 0.5, 22.1, "CORREÇÃO"
-      @pdf.ibox 2, 20, 0.5, 22.6, "", ""
-      @pdf.ibox 2, 19.5, 1, 22.95, "", @xml_cce['detEvento/xCorrecao'], border: 0
+      @pdf.ibox 3.5, 20, 0.5, 22.6, "", ""
+      @pdf.ibox 3.5, 19.5, 1, 22.95, "", @xml_cce['detEvento/xCorrecao'], border: 0
     end
 
     def descricao_ambiente(ambiente)
