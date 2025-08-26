@@ -28,7 +28,7 @@ module RubyDanfe
     private
     def render_titulo
       @pdf.ibox 2.55, 16.10, 0.25, 0.42, '',
-        "PREFEITURA DO MUNICÍPIO DE #{municipios[@xml['infNFSe/cLocIncid']].upcase} \n" +
+        "PREFEITURA DO MUNICÍPIO DE #{municipios[@xml['infNFSe/cLocIncid']]&.upcase} \n" +
         "Secretaria Municipal da Fazenda \n" +
         "NOTA FISCAL ELETRÔNICA DE SERVIÇOS - NFS-e \n" +
         "RPS n° #{@xml['infNFSe/nNFSe']}, emitido em #{@xml['infNFSe/dhProc']}", {:align => :center, :valign => :center}
@@ -89,7 +89,7 @@ module RubyDanfe
       @pdf.ibox     0.85, 3.46, 7.17, 25.07, "Alíquota",                 ''
       @pdf.inumeric 0.85, 3.46, 10.63, 25.07, "Valor do ISS",            ''
       @pdf.inumeric 0.85, 6.73, 14.09, 25.07, "Crédito",                 ''
-      @pdf.ibox     0.85, 10.38, 0.25, 25.92, "Município da Prestação do Serviço", municipios[@xml['infNFSe/cLocIncid']], style: :bold
+      @pdf.ibox     0.85, 10.38, 0.25, 25.92, "Município da Prestação do Serviço", municipios[@xml['infNFSe/cLocIncid']] || '', style: :bold
       @pdf.ibox     0.85, 10.19, 10.63, 25.92, "Número Inscrição da Obra", '', style: :bold
     end
 
