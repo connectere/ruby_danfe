@@ -6,9 +6,12 @@ module RubyDanfe
       @pdf = Document.new
       @vol = 0
       @logo = logo
+      @y_offset = 0
     end
 
     def generatePDF
+      @y_offset = @xml.css('entrega').any? ? 2.97 : 0
+
       @pdf.repeat :all do
         render_canhoto
         render_emitente
@@ -20,6 +23,7 @@ module RubyDanfe
       end
 
       render_titulo
+      render_local_entrega
       render_faturas
       render_calculo_do_imposto
       render_transportadora_e_volumes
@@ -40,6 +44,24 @@ module RubyDanfe
     end
 
     private
+    def render_local_entrega
+      return if @xml.css('entrega').empty?
+
+      @pdf.ititle 0.42, 10.00, 0.25, 11.12, "INFORMAÇÕES DO LOCAL DE ENTREGA"
+
+      @pdf.ibox 0.85, 10.24, 0.25, 11.54, "NOME/RAZÃO SOCIAL", @xml['entrega/xNome']
+      @pdf.ibox 0.85, 5.33, 10.49, 11.54, "CNPJ/CPF", @xml['entrega/CNPJ'] != "" ? @xml['entrega/CNPJ'] : @xml['entrega/CPF']
+      @pdf.ibox 0.85, 5.00, 15.82, 11.54, "INSCRIÇÃO ESTADUAL", @xml['entrega/IE']
+
+      @pdf.ibox 0.85, 12.00, 0.25, 12.39, "ENDEREÇO", @xml['entrega/xLgr'] + ", " + @xml['entrega/nro'] + " " + @xml['entrega/xCpl']
+      @pdf.ibox 0.85, 5.90, 12.25, 12.39, "BAIRRO/DISTRITO", @xml['entrega/xBairro']
+      @pdf.ibox 0.85, 2.67, 18.15, 12.39, "CEP", @xml['entrega/CEP']
+
+      @pdf.ibox 0.85, 12.00, 0.25, 13.24, "MUNICÍPIO", @xml['entrega/xMun']
+      @pdf.ibox 0.85, 1.14, 12.25, 13.24, "UF", @xml['entrega/UF']
+      @pdf.ibox 0.85, 7.43, 13.39, 13.24, "FONE/FAX", @xml['entrega/fone']
+    end
+
     def render_canhoto
       @pdf.ibox 0.85, 16.10, 0.25, 0.42, "RECEBEMOS DE " + @xml['emit/xNome'] + " OS PRODUTOS CONSTANTES DA NOTA FISCAL INDICADA ABAIXO"
       @pdf.ibox 0.85, 4.10, 0.25, 1.27, "DATA DE RECEBIMENTO"
@@ -121,11 +143,11 @@ module RubyDanfe
     end
 
     def render_faturas
-      @pdf.ititle 0.42, 10.00, 0.25, 11.12, "FATURA / DUPLICATAS"
-      @pdf.ibox 0.85, 20.57, 0.25, 11.51
+      @pdf.ititle 0.42, 10.00, 0.25, 11.12 + @y_offset, "FATURA / DUPLICATAS"
+      @pdf.ibox 0.85, 20.57, 0.25, 11.51 + @y_offset
 
       x = 0.25
-      y = 11.51
+      y = 11.51 + @y_offset
       @xml.collect('xmlns', 'dup') do |det|
         @pdf.ibox 0.85, 2.12, x, y, '', 'Núm.:', { :size => 6, :border => 0, :style => :italic }
         @pdf.ibox 0.85, 2.12, x + 0.70, y, '', det.css('nDup').text, { :size => 6, :border => 0 }
@@ -156,34 +178,34 @@ module RubyDanfe
     end
 
     def render_calculo_do_imposto
-      @pdf.ititle 0.42, 5.60, 0.25, 12.36, "CÁLCULO DO IMPOSTO"
+      @pdf.ititle 0.42, 5.60, 0.25, 12.36 + @y_offset, "CÁLCULO DO IMPOSTO"
 
-      @pdf.inumeric 0.85, 4.06, 0.25, 12.78, "BASE DE CÁLCULO DO ICMS", @xml['ICMSTot/vBC']
-      @pdf.inumeric 0.85, 4.06, 4.31, 12.78, "VALOR DO ICMS", @xml['ICMSTot/vICMS']
-      @pdf.inumeric 0.85, 4.06, 8.37, 12.78, "BASE DE CÁLCULO DO ICMS ST", @xml['ICMSTot/vBCST']
-      @pdf.inumeric 0.85, 4.06, 12.43, 12.78, "VALOR DO ICMS ST", @xml['ICMSTot/vST']
-      @pdf.inumeric 0.85, 4.32, 16.49, 12.78, "VALOR TOTAL DOS PRODUTOS", @xml['ICMSTot/vProd']
-      @pdf.inumeric 0.85, 3.46, 0.25, 13.63, "VALOR DO FRETE", @xml['ICMSTot/vFrete']
-      @pdf.inumeric 0.85, 3.46, 3.71, 13.63, "VALOR DO SEGURO", @xml['ICMSTot/vSeg']
-      @pdf.inumeric 0.85, 3.46, 7.17, 13.63, "DESCONTO", @xml['ICMSTot/vDesc']
-      @pdf.inumeric 0.85, 3.46, 10.63, 13.63, "OUTRAS DESPESAS ACESSORIAS", @xml['ICMSTot/vOutro']
-      @pdf.inumeric 0.85, 3.46, 14.09, 13.63, "VALOR DO IPI", @xml['ICMSTot/vIPI']
-      @pdf.inumeric 0.85, 3.27, 17.55, 13.63, "VALOR TOTAL DA NOTA", @xml['ICMSTot/vNF'], :style => :bold
+      @pdf.inumeric 0.85, 4.06, 0.25, 12.78 + @y_offset, "BASE DE CÁLCULO DO ICMS", @xml['ICMSTot/vBC']
+      @pdf.inumeric 0.85, 4.06, 4.31, 12.78 + @y_offset, "VALOR DO ICMS", @xml['ICMSTot/vICMS']
+      @pdf.inumeric 0.85, 4.06, 8.37, 12.78 + @y_offset, "BASE DE CÁLCULO DO ICMS ST", @xml['ICMSTot/vBCST']
+      @pdf.inumeric 0.85, 4.06, 12.43, 12.78 + @y_offset, "VALOR DO ICMS ST", @xml['ICMSTot/vST']
+      @pdf.inumeric 0.85, 4.32, 16.49, 12.78 + @y_offset, "VALOR TOTAL DOS PRODUTOS", @xml['ICMSTot/vProd']
+      @pdf.inumeric 0.85, 3.46, 0.25, 13.63 + @y_offset, "VALOR DO FRETE", @xml['ICMSTot/vFrete']
+      @pdf.inumeric 0.85, 3.46, 3.71, 13.63 + @y_offset, "VALOR DO SEGURO", @xml['ICMSTot/vSeg']
+      @pdf.inumeric 0.85, 3.46, 7.17, 13.63 + @y_offset, "DESCONTO", @xml['ICMSTot/vDesc']
+      @pdf.inumeric 0.85, 3.46, 10.63, 13.63 + @y_offset, "OUTRAS DESPESAS ACESSORIAS", @xml['ICMSTot/vOutro']
+      @pdf.inumeric 0.85, 3.46, 14.09, 13.63 + @y_offset, "VALOR DO IPI", @xml['ICMSTot/vIPI']
+      @pdf.inumeric 0.85, 3.27, 17.55, 13.63 + @y_offset, "VALOR TOTAL DA NOTA", @xml['ICMSTot/vNF'], :style => :bold
     end
 
     def render_transportadora_e_volumes
-      @pdf.ititle 0.42, 10.00, 0.25, 14.48, "TRANSPORTADOR / VOLUMES TRANSPORTADOS"
+      @pdf.ititle 0.42, 10.00, 0.25, 14.48 + @y_offset, "TRANSPORTADOR / VOLUMES TRANSPORTADOS"
 
-      @pdf.ibox 0.85, 9.02, 0.25, 14.90, "RAZÃO SOCIAL", @xml['transporta/xNome']
-      @pdf.ibox 0.85, 2.79, 9.27, 14.90, "FRETE POR CONTA", descricao_modalidade_frete(@xml['transp/modFrete'])
-      @pdf.ibox 0.85, 1.78, 12.06, 14.90, "CODIGO ANTT", @xml['veicTransp/RNTC']
-      @pdf.ibox 0.85, 2.29, 13.84, 14.90, "PLACA DO VEÍCULO", @xml['veicTransp/placa']
-      @pdf.ibox 0.85, 0.76, 16.13, 14.90, "UF", @xml['veicTransp/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 14.90, "CNPJ/CPF", (@xml['transporta/CNPJ'].present? ? @xml['transporta/CNPJ'] : @xml['transporta/CPF'])
-      @pdf.ibox 0.85, 9.02, 0.25, 15.75, "ENDEREÇO", @xml['transporta/xEnder']
-      @pdf.ibox 0.85, 6.86, 9.27, 15.75, "MUNICÍPIO", @xml['transporta/xMun']
-      @pdf.ibox 0.85, 0.76, 16.13, 15.75, "UF", @xml['transporta/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 15.75, "INSCRIÇÂO ESTADUAL", @xml['transporta/IE']
+      @pdf.ibox 0.85, 9.02, 0.25, 14.90 + @y_offset, "RAZÃO SOCIAL", @xml['transporta/xNome']
+      @pdf.ibox 0.85, 2.79, 9.27, 14.90 + @y_offset, "FRETE POR CONTA", descricao_modalidade_frete(@xml['transp/modFrete'])
+      @pdf.ibox 0.85, 1.78, 12.06, 14.90 + @y_offset, "CODIGO ANTT", @xml['veicTransp/RNTC']
+      @pdf.ibox 0.85, 2.29, 13.84, 14.90 + @y_offset, "PLACA DO VEÍCULO", @xml['veicTransp/placa']
+      @pdf.ibox 0.85, 0.76, 16.13, 14.90 + @y_offset, "UF", @xml['veicTransp/UF']
+      @pdf.ibox 0.85, 3.94, 16.89, 14.90 + @y_offset, "CNPJ/CPF", (@xml['transporta/CNPJ'].present? ? @xml['transporta/CNPJ'] : @xml['transporta/CPF'])
+      @pdf.ibox 0.85, 9.02, 0.25, 15.75 + @y_offset, "ENDEREÇO", @xml['transporta/xEnder']
+      @pdf.ibox 0.85, 6.86, 9.27, 15.75 + @y_offset, "MUNICÍPIO", @xml['transporta/xMun']
+      @pdf.ibox 0.85, 0.76, 16.13, 15.75 + @y_offset, "UF", @xml['transporta/UF']
+      @pdf.ibox 0.85, 3.94, 16.89, 15.75 + @y_offset, "INSCRIÇÂO ESTADUAL", @xml['transporta/IE']
 
       @vol = 0
 
@@ -207,25 +229,25 @@ module RubyDanfe
       end
 
       if @vol == 0
-        @pdf.ibox 0.85, 2.80, 0.25, 16.60, "QUANTIDADE"
-        @pdf.ibox 0.85, 5.00, 3.05, 16.60, "ESPÉCIE"
-        @pdf.ibox 0.85, 3.05, 8.05, 16.60, "MARCA"
-        @pdf.ibox 0.85, 3.00, 11.10, 16.60, "NUMERAÇÃO"
-        @pdf.ibox 0.85, 3.43, 14.10, 16.60, "PESO BRUTO"
-        @pdf.ibox 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO"
+        @pdf.ibox 0.85, 2.80, 0.25, 16.60 + @y_offset, "QUANTIDADE"
+        @pdf.ibox 0.85, 5.00, 3.05, 16.60 + @y_offset, "ESPÉCIE"
+        @pdf.ibox 0.85, 3.05, 8.05, 16.60 + @y_offset, "MARCA"
+        @pdf.ibox 0.85, 3.00, 11.10, 16.60 + @y_offset, "NUMERAÇÃO"
+        @pdf.ibox 0.85, 3.43, 14.10, 16.60 + @y_offset, "PESO BRUTO"
+        @pdf.ibox 0.85, 3.30, 17.53, 16.60 + @y_offset, "PESO LÍQUIDO"
       else
-        @pdf.ibox 0.85, 2.80, 0.25, 16.60, "QUANTIDADE", (quantidade.round == quantidade ? quantidade.to_i : quantidade).to_s
-        @pdf.ibox 0.85, 5.00, 3.05, 16.60, "ESPÉCIE", especie
-        @pdf.ibox 0.85, 3.05, 8.05, 16.60, "MARCA", marca
-        @pdf.ibox 0.85, 3.00, 11.10, 16.60, "NUMERAÇÃO", numeracao
-        @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", peso_bruto.to_s, {:decimals => 3}
-        @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", peso_liquido.to_s, {:decimals => 3}
+        @pdf.ibox 0.85, 2.80, 0.25, 16.60 + @y_offset, "QUANTIDADE", (quantidade.round == quantidade ? quantidade.to_i : quantidade).to_s
+        @pdf.ibox 0.85, 5.00, 3.05, 16.60 + @y_offset, "ESPÉCIE", especie
+        @pdf.ibox 0.85, 3.05, 8.05, 16.60 + @y_offset, "MARCA", marca
+        @pdf.ibox 0.85, 3.00, 11.10, 16.60 + @y_offset, "NUMERAÇÃO", numeracao
+        @pdf.inumeric 0.85, 3.43, 14.10, 16.60 + @y_offset, "PESO BRUTO", peso_bruto.to_s, {:decimals => 3}
+        @pdf.inumeric 0.85, 3.30, 17.53, 16.60 + @y_offset, "PESO LÍQUIDO", peso_liquido.to_s, {:decimals => 3}
       end
     end
 
     def render_cabecalho_dos_produtos(page_number)
-      base_y = page_number == 1 ? 17.45 : 8.2
-      height = page_number == 1 ? 6.70 : 17.2
+      base_y = page_number == 1 ? 17.45 + @y_offset : 8.2
+      height = page_number == 1 ? 6.70 - @y_offset : 17.2
 
       @pdf.ititle 0.42, 10.00, 0.25, base_y, "DADOS DO PRODUTO / SERVIÇO"
 
@@ -284,16 +306,6 @@ module RubyDanfe
 
       info_adicional += @xml['infAdic/infCpl']
 
-      if @xml.css('entrega').any?
-        info_adicional += " LOCAL DA ENTREGA: " +
-          @xml['entrega/xLgr'] + " " +
-          @xml['entrega/nro'] + " " +
-          "Bairro/Distrito: " + @xml['entrega/xBairro'] + " " +
-          "Municipio: " + @xml['entrega/xMun'] + " " +
-          "UF: " + @xml['entrega/UF'] + " " +
-          "País: Brasil"
-      end
-
       if @xml['infAdic/infAdFisco'] != ""
         info_adicional += "\n#{@xml['infAdic/infAdFisco']}"
       end
@@ -306,7 +318,7 @@ module RubyDanfe
 
     def render_produtos
       @pdf.font_size(6) do
-        @produtos_box = @pdf.itable 6.37, 21.50, 0.25, 18.17,
+        @produtos_box = @pdf.itable 6.37 - (@pdf.page_number == 1 ? @y_offset : 0), 21.50, 0.25, 18.17 + (@pdf.page_number == 1 ? @y_offset : 0),
           @xml.collect('xmlns', 'det')  { |det|
             [
               det.css('prod/cProd').text, #I02
@@ -348,8 +360,8 @@ module RubyDanfe
             table.column(0..13).borders = [:top]
             table.before_rendering_page do |page|
               if @pdf.page_number == 1
-                @pdf.bounds.instance_variable_set(:@y, (22.2).cm)
-                @pdf.bounds.instance_variable_set(:@height, (16.8).cm)
+                @pdf.bounds.instance_variable_set(:@y, (22.2 - @y_offset).cm)
+                @pdf.bounds.instance_variable_set(:@height, (16.8 - @y_offset).cm)
               else
                 @pdf.bounds.instance_variable_set(:@y, (21).cm)
               end
