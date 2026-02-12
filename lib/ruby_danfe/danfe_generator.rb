@@ -20,6 +20,7 @@ module RubyDanfe
       end
 
       render_titulo
+      render_locais_entrega_retirada
       render_faturas
       render_calculo_do_imposto
       render_transportadora_e_volumes
@@ -40,6 +41,39 @@ module RubyDanfe
     end
 
     private
+
+    def render_locais_entrega_retirada
+      if @xml.css('retirada').any?
+        render_bloco_local("retirada", "INFORMAÇÕES DO LOCAL DE RETIRADA")
+      else
+        render_bloco_local("entrega", "INFORMAÇÕES DO LOCAL DE ENTREGA")
+      end
+    end
+
+    def render_bloco_local(tag, titulo)
+      @pdf.ititle 0.42, 10.00, 0.25, 11.12, titulo
+
+      @pdf.ibox 0.85, 12.0, 0.25, 11.54, "NOME/RAZÃO SOCIAL", @xml["#{tag}/xNome"]
+
+      documento = @xml["#{tag}/CNPJ"].present? ? @xml["#{tag}/CNPJ"] : @xml["#{tag}/CPF"]
+      @pdf.ibox 0.85, 4.0, 12.25, 11.54, "CNPJ/CPF", documento
+
+      @pdf.ibox 0.85, 4.57, 16.25, 11.54, "INSCRIÇÃO ESTADUAL", @xml["#{tag}/IE"]
+
+      xLgr = @xml["#{tag}/xLgr"].to_s
+      nro  = @xml["#{tag}/nro"].to_s
+      xCpl = @xml["#{tag}/xCpl"].to_s
+      endereco = [xLgr, nro, xCpl].reject { |s| s == "" }.join(", ")
+
+      @pdf.ibox 0.85, 9.0, 0.25, 12.39, "ENDEREÇO", endereco
+      @pdf.ibox 0.85, 8.22, 9.25, 12.39, "BAIRRO/DISTRITO", @xml["#{tag}/xBairro"]
+      @pdf.ibox 0.85, 3.35, 17.47, 12.39, "CEP", @xml["#{tag}/CEP"]
+
+      @pdf.ibox 0.85, 15.0, 0.25, 13.24, "MUNICÍPIO", @xml["#{tag}/xMun"]
+      @pdf.ibox 0.85, 1.5, 15.25, 13.24, "UF", @xml["#{tag}/UF"]
+      @pdf.ibox 0.85, 4.07, 16.75, 13.24, "FONE/FAX", @xml["#{tag}/fone"]
+    end
+
     def render_canhoto
       @pdf.ibox 0.85, 16.10, 0.25, 0.42, "RECEBEMOS DE " + @xml['emit/xNome'] + " OS PRODUTOS CONSTANTES DA NOTA FISCAL INDICADA ABAIXO"
       @pdf.ibox 0.85, 4.10, 0.25, 1.27, "DATA DE RECEBIMENTO"
@@ -121,11 +155,11 @@ module RubyDanfe
     end
 
     def render_faturas
-      @pdf.ititle 0.42, 10.00, 0.25, 11.12, "FATURA / DUPLICATAS"
-      @pdf.ibox 0.85, 20.57, 0.25, 11.51
+      @pdf.ititle 0.42, 10.00, 0.25, 14.09, "FATURA / DUPLICATAS"
+      @pdf.ibox 0.85, 20.57, 0.25, 14.48
 
       x = 0.25
-      y = 11.51
+      y = 14.48
       @xml.collect('xmlns', 'dup') do |det|
         @pdf.ibox 0.85, 2.12, x, y, '', 'Núm.:', { :size => 6, :border => 0, :style => :italic }
         @pdf.ibox 0.85, 2.12, x + 0.70, y, '', det.css('nDup').text, { :size => 6, :border => 0 }
@@ -156,34 +190,34 @@ module RubyDanfe
     end
 
     def render_calculo_do_imposto
-      @pdf.ititle 0.42, 5.60, 0.25, 12.36, "CÁLCULO DO IMPOSTO"
+      @pdf.ititle 0.42, 5.60, 0.25, 15.33, "CÁLCULO DO IMPOSTO"
 
-      @pdf.inumeric 0.85, 4.06, 0.25, 12.78, "BASE DE CÁLCULO DO ICMS", @xml['ICMSTot/vBC']
-      @pdf.inumeric 0.85, 4.06, 4.31, 12.78, "VALOR DO ICMS", @xml['ICMSTot/vICMS']
-      @pdf.inumeric 0.85, 4.06, 8.37, 12.78, "BASE DE CÁLCULO DO ICMS ST", @xml['ICMSTot/vBCST']
-      @pdf.inumeric 0.85, 4.06, 12.43, 12.78, "VALOR DO ICMS ST", @xml['ICMSTot/vST']
-      @pdf.inumeric 0.85, 4.32, 16.49, 12.78, "VALOR TOTAL DOS PRODUTOS", @xml['ICMSTot/vProd']
-      @pdf.inumeric 0.85, 3.46, 0.25, 13.63, "VALOR DO FRETE", @xml['ICMSTot/vFrete']
-      @pdf.inumeric 0.85, 3.46, 3.71, 13.63, "VALOR DO SEGURO", @xml['ICMSTot/vSeg']
-      @pdf.inumeric 0.85, 3.46, 7.17, 13.63, "DESCONTO", @xml['ICMSTot/vDesc']
-      @pdf.inumeric 0.85, 3.46, 10.63, 13.63, "OUTRAS DESPESAS ACESSORIAS", @xml['ICMSTot/vOutro']
-      @pdf.inumeric 0.85, 3.46, 14.09, 13.63, "VALOR DO IPI", @xml['ICMSTot/vIPI']
-      @pdf.inumeric 0.85, 3.27, 17.55, 13.63, "VALOR TOTAL DA NOTA", @xml['ICMSTot/vNF'], :style => :bold
+      @pdf.inumeric 0.85, 4.06, 0.25, 15.75, "BASE DE CÁLCULO DO ICMS", @xml['ICMSTot/vBC']
+      @pdf.inumeric 0.85, 4.06, 4.31, 15.75, "VALOR DO ICMS", @xml['ICMSTot/vICMS']
+      @pdf.inumeric 0.85, 4.06, 8.37, 15.75, "BASE DE CÁLCULO DO ICMS ST", @xml['ICMSTot/vBCST']
+      @pdf.inumeric 0.85, 4.06, 12.43, 15.75, "VALOR DO ICMS ST", @xml['ICMSTot/vST']
+      @pdf.inumeric 0.85, 4.32, 16.49, 15.75, "VALOR TOTAL DOS PRODUTOS", @xml['ICMSTot/vProd']
+      @pdf.inumeric 0.85, 3.46, 0.25, 16.60, "VALOR DO FRETE", @xml['ICMSTot/vFrete']
+      @pdf.inumeric 0.85, 3.46, 3.71, 16.60, "VALOR DO SEGURO", @xml['ICMSTot/vSeg']
+      @pdf.inumeric 0.85, 3.46, 7.17, 16.60, "DESCONTO", @xml['ICMSTot/vDesc']
+      @pdf.inumeric 0.85, 3.46, 10.63, 16.60, "OUTRAS DESPESAS ACESSORIAS", @xml['ICMSTot/vOutro']
+      @pdf.inumeric 0.85, 3.46, 14.09, 16.60, "VALOR DO IPI", @xml['ICMSTot/vIPI']
+      @pdf.inumeric 0.85, 3.27, 17.55, 16.60, "VALOR TOTAL DA NOTA", @xml['ICMSTot/vNF'], :style => :bold
     end
 
     def render_transportadora_e_volumes
-      @pdf.ititle 0.42, 10.00, 0.25, 14.48, "TRANSPORTADOR / VOLUMES TRANSPORTADOS"
+      @pdf.ititle 0.42, 10.00, 0.25, 17.45, "TRANSPORTADOR / VOLUMES TRANSPORTADOS"
 
-      @pdf.ibox 0.85, 9.02, 0.25, 14.90, "RAZÃO SOCIAL", @xml['transporta/xNome']
-      @pdf.ibox 0.85, 2.79, 9.27, 14.90, "FRETE POR CONTA", descricao_modalidade_frete(@xml['transp/modFrete'])
-      @pdf.ibox 0.85, 1.78, 12.06, 14.90, "CODIGO ANTT", @xml['veicTransp/RNTC']
-      @pdf.ibox 0.85, 2.29, 13.84, 14.90, "PLACA DO VEÍCULO", @xml['veicTransp/placa']
-      @pdf.ibox 0.85, 0.76, 16.13, 14.90, "UF", @xml['veicTransp/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 14.90, "CNPJ/CPF", (@xml['transporta/CNPJ'].present? ? @xml['transporta/CNPJ'] : @xml['transporta/CPF'])
-      @pdf.ibox 0.85, 9.02, 0.25, 15.75, "ENDEREÇO", @xml['transporta/xEnder']
-      @pdf.ibox 0.85, 6.86, 9.27, 15.75, "MUNICÍPIO", @xml['transporta/xMun']
-      @pdf.ibox 0.85, 0.76, 16.13, 15.75, "UF", @xml['transporta/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 15.75, "INSCRIÇÂO ESTADUAL", @xml['transporta/IE']
+      @pdf.ibox 0.85, 9.02, 0.25, 17.87, "RAZÃO SOCIAL", @xml['transporta/xNome']
+      @pdf.ibox 0.85, 2.79, 9.27, 17.87, "FRETE POR CONTA", descricao_modalidade_frete(@xml['transp/modFrete'])
+      @pdf.ibox 0.85, 1.78, 12.06, 17.87, "CODIGO ANTT", @xml['veicTransp/RNTC']
+      @pdf.ibox 0.85, 2.29, 13.84, 17.87, "PLACA DO VEÍCULO", @xml['veicTransp/placa']
+      @pdf.ibox 0.85, 0.76, 16.13, 17.87, "UF", @xml['veicTransp/UF']
+      @pdf.ibox 0.85, 3.94, 16.89, 17.87, "CNPJ/CPF", (@xml['transporta/CNPJ'].present? ? @xml['transporta/CNPJ'] : @xml['transporta/CPF'])
+      @pdf.ibox 0.85, 9.02, 0.25, 18.72, "ENDEREÇO", @xml['transporta/xEnder']
+      @pdf.ibox 0.85, 6.86, 9.27, 18.72, "MUNICÍPIO", @xml['transporta/xMun']
+      @pdf.ibox 0.85, 0.76, 16.13, 18.72, "UF", @xml['transporta/UF']
+      @pdf.ibox 0.85, 3.94, 16.89, 18.72, "INSCRIÇÂO ESTADUAL", @xml['transporta/IE']
 
       @vol = 0
 
@@ -207,25 +241,25 @@ module RubyDanfe
       end
 
       if @vol == 0
-        @pdf.ibox 0.85, 2.80, 0.25, 16.60, "QUANTIDADE"
-        @pdf.ibox 0.85, 5.00, 3.05, 16.60, "ESPÉCIE"
-        @pdf.ibox 0.85, 3.05, 8.05, 16.60, "MARCA"
-        @pdf.ibox 0.85, 3.00, 11.10, 16.60, "NUMERAÇÃO"
-        @pdf.ibox 0.85, 3.43, 14.10, 16.60, "PESO BRUTO"
-        @pdf.ibox 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO"
+        @pdf.ibox 0.85, 2.80, 0.25, 19.57, "QUANTIDADE"
+        @pdf.ibox 0.85, 5.00, 3.05, 19.57, "ESPÉCIE"
+        @pdf.ibox 0.85, 3.05, 8.05, 19.57, "MARCA"
+        @pdf.ibox 0.85, 3.00, 11.10, 19.57, "NUMERAÇÃO"
+        @pdf.ibox 0.85, 3.43, 14.10, 19.57, "PESO BRUTO"
+        @pdf.ibox 0.85, 3.30, 17.53, 19.57, "PESO LÍQUIDO"
       else
-        @pdf.ibox 0.85, 2.80, 0.25, 16.60, "QUANTIDADE", (quantidade.round == quantidade ? quantidade.to_i : quantidade).to_s
-        @pdf.ibox 0.85, 5.00, 3.05, 16.60, "ESPÉCIE", especie
-        @pdf.ibox 0.85, 3.05, 8.05, 16.60, "MARCA", marca
-        @pdf.ibox 0.85, 3.00, 11.10, 16.60, "NUMERAÇÃO", numeracao
-        @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", peso_bruto.to_s, {:decimals => 3}
-        @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", peso_liquido.to_s, {:decimals => 3}
+        @pdf.ibox 0.85, 2.80, 0.25, 19.57, "QUANTIDADE", (quantidade.round == quantidade ? quantidade.to_i : quantidade).to_s
+        @pdf.ibox 0.85, 5.00, 3.05, 19.57, "ESPÉCIE", especie
+        @pdf.ibox 0.85, 3.05, 8.05, 19.57, "MARCA", marca
+        @pdf.ibox 0.85, 3.00, 11.10, 19.57, "NUMERAÇÃO", numeracao
+        @pdf.inumeric 0.85, 3.43, 14.10, 19.57, "PESO BRUTO", peso_bruto.to_s, {:decimals => 3}
+        @pdf.inumeric 0.85, 3.30, 17.53, 19.57, "PESO LÍQUIDO", peso_liquido.to_s, {:decimals => 3}
       end
     end
 
     def render_cabecalho_dos_produtos(page_number)
-      base_y = page_number == 1 ? 17.45 : 8.2
-      height = page_number == 1 ? 6.70 : 17.2
+      base_y = page_number == 1 ? 20.42 : 8.2
+      height = page_number == 1 ? 3.73 : 17.2
 
       @pdf.ititle 0.42, 10.00, 0.25, base_y, "DADOS DO PRODUTO / SERVIÇO"
 
@@ -284,16 +318,6 @@ module RubyDanfe
 
       info_adicional += @xml['infAdic/infCpl']
 
-      if @xml.css('entrega').any?
-        info_adicional += " LOCAL DA ENTREGA: " +
-          @xml['entrega/xLgr'] + " " +
-          @xml['entrega/nro'] + " " +
-          "Bairro/Distrito: " + @xml['entrega/xBairro'] + " " +
-          "Municipio: " + @xml['entrega/xMun'] + " " +
-          "UF: " + @xml['entrega/UF'] + " " +
-          "País: Brasil"
-      end
-
       if @xml['infAdic/infAdFisco'] != ""
         info_adicional += "\n#{@xml['infAdic/infAdFisco']}"
       end
@@ -306,7 +330,7 @@ module RubyDanfe
 
     def render_produtos
       @pdf.font_size(6) do
-        @produtos_box = @pdf.itable 6.37, 21.50, 0.25, 18.17,
+        @produtos_box = @pdf.itable 3.40, 21.50, 0.25, 21.14,
           @xml.collect('xmlns', 'det')  { |det|
             [
               det.css('prod/cProd').text, #I02
@@ -348,8 +372,8 @@ module RubyDanfe
             table.column(0..13).borders = [:top]
             table.before_rendering_page do |page|
               if @pdf.page_number == 1
-                @pdf.bounds.instance_variable_set(:@y, (22.2).cm)
-                @pdf.bounds.instance_variable_set(:@height, (16.8).cm)
+                @pdf.bounds.instance_variable_set(:@y, 19.23.cm)
+                @pdf.bounds.instance_variable_set(:@height, 13.83.cm)
               else
                 @pdf.bounds.instance_variable_set(:@y, (21).cm)
               end
