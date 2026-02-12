@@ -61,7 +61,7 @@ module RubyDanfe
 
       @pdf.ibox 0.85, 15.00, 0.25, 13.24, "MUNICÍPIO", @xml['entrega/xMun']
       @pdf.ibox 0.85, 1.50, 15.25, 13.24, "UF", @xml['entrega/UF']
-      @pdf.ibox 0.85, 4.07, 16.75, 13.24, "FONE / FAX", @xml['entrega/fone']
+      @pdf.ibox 0.85, 4.07, 16.75, 13.24, "FONE/FAX", @xml['entrega/fone']
     end
 
     def render_canhoto
