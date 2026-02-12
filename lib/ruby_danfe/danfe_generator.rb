@@ -49,17 +49,19 @@ module RubyDanfe
 
       @pdf.ititle 0.42, 10.00, 0.25, 11.12, "INFORMAÇÕES DO LOCAL DE ENTREGA"
 
-      @pdf.ibox 0.85, 10.24, 0.25, 11.54, "NOME/RAZÃO SOCIAL", @xml['entrega/xNome']
-      @pdf.ibox 0.85, 5.33, 10.49, 11.54, "CNPJ/CPF", @xml['entrega/CNPJ'] != "" ? @xml['entrega/CNPJ'] : @xml['entrega/CPF']
-      @pdf.ibox 0.85, 5.00, 15.82, 11.54, "INSCRIÇÃO ESTADUAL", @xml['entrega/IE']
+      @pdf.ibox 0.85, 12.00, 0.25, 11.54, "NOME/RAZÃO SOCIAL", @xml['entrega/xNome']
 
-      @pdf.ibox 0.85, 12.00, 0.25, 12.39, "ENDEREÇO", @xml['entrega/xLgr'] + ", " + @xml['entrega/nro'] + " " + @xml['entrega/xCpl']
-      @pdf.ibox 0.85, 5.90, 12.25, 12.39, "BAIRRO/DISTRITO", @xml['entrega/xBairro']
-      @pdf.ibox 0.85, 2.67, 18.15, 12.39, "CEP", @xml['entrega/CEP']
+      @pdf.ibox 0.85, 4.00, 12.25, 11.54, "CNPJ/CPF", @xml['entrega/CNPJ'].present? ? @xml['entrega/CNPJ'] : @xml['entrega/CPF']
 
-      @pdf.ibox 0.85, 12.00, 0.25, 13.24, "MUNICÍPIO", @xml['entrega/xMun']
-      @pdf.ibox 0.85, 1.14, 12.25, 13.24, "UF", @xml['entrega/UF']
-      @pdf.ibox 0.85, 7.43, 13.39, 13.24, "FONE/FAX", @xml['entrega/fone']
+      @pdf.ibox 0.85, 4.57, 16.25, 11.54, "INSCRIÇÃO ESTADUAL", @xml['entrega/IE']
+
+      @pdf.ibox 0.85, 9.00, 0.25, 12.39, "ENDEREÇO", @xml['entrega/xLgr'] + ", " + @xml['entrega/nro'] + " " + @xml['entrega/xCpl']
+      @pdf.ibox 0.85, 8.22, 9.25, 12.39, "BAIRRO/DISTRITO", @xml['entrega/xBairro']
+      @pdf.ibox 0.85, 3.35, 17.47, 12.39, "CEP", @xml['entrega/CEP']
+
+      @pdf.ibox 0.85, 15.00, 0.25, 13.24, "MUNICÍPIO", @xml['entrega/xMun']
+      @pdf.ibox 0.85, 1.50, 15.25, 13.24, "UF", @xml['entrega/UF']
+      @pdf.ibox 0.85, 4.07, 16.75, 13.24, "FONE / FAX", @xml['entrega/fone']
     end
 
     def render_canhoto
